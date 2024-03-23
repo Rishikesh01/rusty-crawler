@@ -1,7 +1,6 @@
 use reqwest::Error;
 use scraper::{Html, Selector};
 
-const PLAY_STORE_URL: &str = "https://play.google.com";
 const VALID_PATTERN: &str = "/store/apps/details?id=";
 
 pub struct PlayStoreCrawler {
@@ -20,20 +19,20 @@ impl PlayStoreCrawler {
         }
     }
 
-    pub async fn scrape(&self) {
-        let body = self.do_request(PLAY_STORE_URL).await.ok().unwrap();
+    pub async fn scrape(&self, url: &str) -> Vec<String> {
+        let mut urls: Vec<String> = vec![];
+        let body = self.do_request(url).await.ok().unwrap();
 
         let document = Html::parse_document(&body);
         let selector = Selector::parse(".Si6A0c").unwrap();
-        println!("hello");
         for element in document.select(&selector) {
-            match element.value().attr("href") {
-                Some(url) if url.starts_with(VALID_PATTERN) => {
-                    println!("{:?}", url);
+            if let Some(path) = element.value().attr("href") {
+                if path.starts_with(VALID_PATTERN) {
+                    urls.push(path.to_string());
                 }
-                Some(_) => (),
-                None => (),
             };
         }
+
+        urls
     }
 }
