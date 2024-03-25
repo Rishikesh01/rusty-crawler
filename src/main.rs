@@ -5,12 +5,10 @@ use anyhow::Result;
 const PLAY_STORE_URL: &str = "https://play.google.com";
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut paths = crawler::PlayStoreCrawler::new(reqwest::Client::new())
-        .scrape(PLAY_STORE_URL)
-        .await;
-    for path in paths.iter() {
-        println!("{:?}", path);
-    }
+    crawler::PlayStoreCrawler::new(reqwest::Client::new())
+        .start_scraping(PLAY_STORE_URL)
+        .await
+        .unwrap();
     env_logger::init();
     Ok(())
 }
